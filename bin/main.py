@@ -23,11 +23,12 @@ def elab_champs(df, champ_data):
 def clean_df(df, start=True, more=None):
     t1 = ["t1_champ1", "t1_champ2", "t1_champ3", "t1_champ4", "t1_champ5"]
     t2 = ["t2_champ1", "t2_champ2", "t2_champ3", "t2_champ4", "t2_champ5"]
-    additional = ["firstBlood", "winner"] if start is not True else ["winner"] 
-    additional = additional + ['firstDragon'] if more >= 1 else additional
-    additional = additional + ['firstTower'] if more >= 2 else additional
-    additional = additional + ['firstInhibitor'] if more >= 3 else additional
-    additional = additional + ['firstBaron'] if more >= 4 else additional
+    additional = ["firstBlood", "winner"] if start is not True else ["winner"]
+    if more is not None:
+        additional = additional + ['firstDragon'] if more >= 1 else additional
+        additional = additional + ['firstTower'] if more >= 2 else additional
+        additional = additional + ['firstInhibitor'] if more >= 3 else additional
+        additional = additional + ['firstBaron'] if more >= 4 else additional
     # additional = additional + ['firstRiftHerald'] if more == 5 else additional
 
     df = df[t1 + t2 + additional]
@@ -50,8 +51,24 @@ def model(data):
 
     clf = RandomForestClassifier(n_jobs=-1)
     clf.fit(X_train, y_train)
-    print(clf.score(X_test, y_test)) 
+    print(clf.score(X_test, y_test))
+    
+    importances = dict(zip(clf.feature_names_in_, clf.feature_importances_))
+    sorted_importances = sorted(importances.items(), key=lambda x: x[1], reverse=True)
+    print(sorted_importances)
     return
+
+
+def champ_winrate(df, champ_name):
+    wins1 = len(df[(df[f't1_{champ_name}'] == 1) & (df['winner'] == 1)])
+    wins2 = len(df[(df[f't2_{champ_name}'] == 1) & (df['winner'] == 2)])
+
+    losses1 = len(df[(df[f't1_{champ_name}'] == 1) & (df['winner'] == 2)])
+    losses2 = len(df[(df[f't2_{champ_name}'] == 1) & (df['winner'] == 1)])
+    
+    winrate = (wins1 + wins2) / (wins1 + wins2 + losses1 + losses2)
+    
+    return winrate
 
 
 def main():
@@ -77,6 +94,10 @@ def main():
     
     data = (X_train, X_test, y_train, y_test)
     model(data)
+    
+    champ_name = "Volibear"
+    winrate = champ_winrate(df, champ_name)
+    print(winrate)
 
 
 def args_parser():
