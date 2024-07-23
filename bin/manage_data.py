@@ -4,227 +4,185 @@ import argparse
 from scrap import get_riot_ids
 import time
 import os
+import logging
+from dotenv import load_dotenv
 
-# import os
-# import getpass
-# if "RIOT_KEY" not in os.environ:
-#     os.environ["RIOT_KEY"] = getpass.getpass('Enter your RIOT_KEY ---> ')
-# RIOT_KEY = os.environ["RIOT_KEY"]
-RIOT_KEY = None
+# Load environment variables
+load_dotenv()
 
-'''
-regions = {
-    "europe" : ["euw1", "eun1", "tr1", "ru", "la1", "la2"],
-    "americas" : ["na1", "br1"],
-    "asia" : ["kr", "jp1", "ph2", "sg2", "th2", "tw2", "vn2"],
-    "sea" : ["oc1"]
-}
-'''
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Constants
+BASE_URL = "https://{}.api.riotgames.com"
+DDRAGON_URL = "https://ddragon.leagueoflegends.com/cdn/14.14.1/data/en_US/champion.json"
+RIOT_KEY = os.getenv("RIOT_KEY")
 
 
+# Utility function for API requests
+def make_request(url, params=None):
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logging.error(f"API request failed: {e}")
+        return None
+
+
+# Rate limiter decorator
+def rate_limit(func):
+    def wrapper(*args, **kwargs):
+        while True:
+            result = func(*args, **kwargs)
+            if result is not None:
+                return result
+            logging.info("Rate limit reached. Waiting 10 seconds...")
+            time.sleep(10)
+    return wrapper
+
+
+@rate_limit
 def get_puuid(region, username, tag):
-    request = requests.get(f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{username}/{tag}?api_key={RIOT_KEY}")
-    if request.status_code != 200:
-        print("Error puuid: ", request.json())
-        return None
-
-    puuid = request.json()['puuid']
-    return puuid
+    url = f"{BASE_URL}/riot/account/v1/accounts/by-riot-id/{username}/{tag}"
+    data = make_request(url.format(region), params={"api_key": RIOT_KEY})
+    return data['puuid'] if data else None
 
 
+@rate_limit
 def get_info_user(server, puuid):
-    info_user = requests.get(f"https://{server}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={RIOT_KEY}")
-    if info_user.status_code != 200:
-        print("Error info user: ", info_user.json())
-        return None
-    # print(info_user.json())
-    return info_user
+    url = f"{BASE_URL}/lol/summoner/v4/summoners/by-puuid/{puuid}"
+    return make_request(url.format(server), params={"api_key": RIOT_KEY})
 
 
-def get_user_matches(region, puuid, NUM_MATCHES=20):
-    user_matches = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count={NUM_MATCHES}&api_key={RIOT_KEY}")
-    if user_matches.status_code != 200:
-        print("Error user matches: ", user_matches.json())
-        return None
-    # print(user_matches.json())
-    
-    return user_matches.json()
+@rate_limit
+def get_user_matches(region, puuid, num_matches=20):
+    url = f"{BASE_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids"
+    params = {"start": 0, "count": num_matches, "api_key": RIOT_KEY}
+    return make_request(url.format(region), params=params)
 
 
-def get_match_info(region, user_matches):
-    game_ids = []
-    if len(user_matches) > 1:
-        for match in user_matches:
-            while True:
-                match_info = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/{match}?api_key={RIOT_KEY}")
-                if match_info.status_code != 200:
-                    print("Error match info: ", match_info.json())
-                    return None
-                if match_info.status_code == 429:
-                    time.sleep(10)
-                    print("Error 429: ", match_info.json())
-                    print("Waiting 10 seconds...")
-                    continue
-
-                game_ids.append(match_info.json())
-                break
-        return game_ids
-
-    else:
-        match_info = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/{user_matches[0]}?api_key={RIOT_KEY}")
-        if match_info.status_code != 200:
-            print("Error match info: ", match_info.json())
-            return None
-        
-        with open("../data/match_info.json", "w") as file:
-            json.dump(match_info.json(), file, indent=4)
-
-        game_ids.append(match_info.json())
-
-        return game_ids
-
-
-position = {
-    "TOP" : 1,
-    "JUNGLE" : 2,
-    "MIDDLE" : 3,
-    "BOTTOM" : 4,
-    "UTILITY" : 5
-}
-
-
-def extract_match_info(match_info, base):
-    # csv headers: gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald,t1_champ1id,t1_champ1_sum1,t1_champ1_sum2,t1_champ2id,t1_champ2_sum1,t1_champ2_sum2,t1_champ3id,t1_champ3_sum1,t1_champ3_sum2,t1_champ4id,t1_champ4_sum1,t1_champ4_sum2,t1_champ5id,t1_champ5_sum1,t1_champ5_sum2,t1_towerKills,t1_inhibitorKills,t1_baronKills,t1_dragonKills,t1_riftHeraldKills,t1_ban1,t1_ban2,t1_ban3,t1_ban4,t1_ban5,t2_champ1id,t2_champ1_sum1,t2_champ1_sum2,t2_champ2id,t2_champ2_sum1,t2_champ2_sum2,t2_champ3id,t2_champ3_sum1,t2_champ3_sum2,t2_champ4id,t2_champ4_sum1,t2_champ4_sum2,t2_champ5id,t2_champ5_sum1,t2_champ5_sum2,t2_towerKills,t2_inhibitorKills,t2_baronKills,t2_dragonKills,t2_riftHeraldKills,t2_ban1,t2_ban2,t2_ban3,t2_ban4,t2_ban5
-    gameId = match_info['info']['gameId']
-    creationTime = match_info['info']['gameCreation']
-    gameDuration = match_info['info']['gameDuration']
-    seasonId = match_info['info']['gameVersion'].split('.')[0]
-    winner = 1 if match_info['info']['teams'][0]['win'] is True else 2
-    firstBlood = 1 if match_info['info']['teams'][0]['objectives']['champion']['first'] is True else 2
-    firstTower = 1 if match_info['info']['teams'][0]['objectives']['tower']['first'] is True else 2
-    firstInihibitor = 1 if match_info['info']['teams'][0]['objectives']['inhibitor']['first'] is True else 2
-    firstBaron = 1 if match_info['info']['teams'][0]['objectives']['baron']['first'] is True else 2
-    firstDragon = 1 if match_info['info']['teams'][0]['objectives']['dragon']['first'] is True else 2
-    firstRiftHerald = 1 if match_info['info']['teams'][0]['objectives']['riftHerald']['first'] is True else 2
-    
-    # print(winner)
-    champions_used = [(match_info['info']['participants'][i]['championName'], position[match_info['info']['participants'][i]["individualPosition"]]) for i in range(len(match_info['info']['participants']))]
-    t1 = champions_used[:5]
-    t2 = champions_used[5:]
-    t1 = sorted(t1, key=lambda x: x[1])
-    t2 = sorted(t2, key=lambda x: x[1])
-    t1 = [t1[i][0] for i in range(len(t1))]
-    t2 = [t2[i][0] for i in range(len(t2))]
-    
-    t1 = [base['data'][champ]['id'] for champ in t1]
-    t2 = [base['data'][champ]['id'] for champ in t2]
-    
-    champions_used = t1 + t2
-    
-    data = [gameId, creationTime, gameDuration, seasonId, winner, firstBlood, firstTower, firstInihibitor, firstBaron, firstDragon, firstRiftHerald] + [champions_used[i] for i in range(len(champions_used))]
-    return data
-
-
-def get_other_players(match_info):
-    players = match_info['metadata']['participants']
-    # print(players)
+@rate_limit
+def get_match_info(region, match_id):
+    url = f"{BASE_URL}/lol/match/v5/matches/{match_id}"
+    return make_request(url.format(region), params={"api_key": RIOT_KEY})
 
 
 def get_champions():
-    champions = requests.get("https://ddragon.leagueoflegends.com/cdn/14.14.1/data/en_US/champion.json")
-    if champions.status_code != 200:
-        print("Error champions: ", champions.json())
-        return None
-    champions = champions.json()
-    # print(champions)
-
-    with open("../data/new_champions.json", "w") as file:
-        json.dump(champions, file, indent=4)
-
-    return champions
+    return make_request(DDRAGON_URL)
 
 
 def clear_champions(champions):
     new_champions = {
         "type": "champion",
         "version": champions['version'],
-        "data" : {}
+        "data": {}
     }
-    base = new_champions
-    '''
-    "1": {
-        "title": "the Darkin Blade",
-        "id": 1,
-        "key": "Aatrox",
-        "name": "Aatrox",
-    },
-    '''
-    i = 1
-    for campion in champions['data']:
-        new_champions['data'][str(i)] = {
-            "title": champions['data'][campion]['title'],
+    base = new_champions.copy()
+    
+    for i, (key, champ) in enumerate(champions['data'].items(), start=1):
+        champ_data = {
+            "title": champ['title'],
             "id": i,
-            "key": champions['data'][campion]['id'],
-            "name": champions['data'][campion]['name']
+            "key": champ['id'],
+            "name": champ['name']
         }
-        base['data'][campion] = {
-            "title": champions['data'][campion]['title'],
-            "id": i,
-            "key": champions['data'][campion]['id'],
-            "name": champions['data'][campion]['name']
-        }
-        i += 1
+        new_champions['data'][str(i)] = champ_data
+        base['data'][key] = champ_data
     
     return new_champions, base
 
 
-def args_parser():
-    parser = argparse.ArgumentParser(description="RIOT API data manager")
-    parser.add_argument("-k", "--key", help="The RIOT API key", required=True)
-    parser.add_argument("-u", "--username", help="The username of the user", required=False)
-    parser.add_argument("-t", "--tag", help="The tag of the user", required=False)
-    parser.add_argument("-r", "--region", help="The region of the user ('europe', 'sea', 'asia', ...)", required=False)
-    parser.add_argument("-s", "--server", help="The server of the user ('na1', 'euw1', 'kr', ...)", required=False)
-    parser.add_argument("-n", "--num_matches", help="The number of matches to get", required=False)
-    parser.add_argument("-ti", "--tier", help="The tier of the user ('challenger', 'grandmaster', 'master', ...)", required=False)
-    parser.add_argument("-p", "--page", help="The page of the tier", required=False)
-    return parser.parse_args()
+def extract_match_info(match_info, base):
+    info = match_info['info']
+    teams = info['teams']
+    
+    # Check for invalid positions
+    if any(p['individualPosition'] == 'INVALID' for p in info['participants']):
+        logging.info(f"Skipping match {info['gameId']} due to invalid position")
+        return None
+
+    data = [
+        info['gameId'],
+        info['gameCreation'],
+        info['gameDuration'],
+        info['gameVersion'].split('.')[0],
+        1 if teams[0]['win'] else 2,
+        1 if teams[0]['objectives']['champion']['first'] else 2,
+        1 if teams[0]['objectives']['tower']['first'] else 2,
+        1 if teams[0]['objectives']['inhibitor']['first'] else 2,
+        1 if teams[0]['objectives']['baron']['first'] else 2,
+        1 if teams[0]['objectives']['dragon']['first'] else 2,
+        1 if teams[0]['objectives']['riftHerald']['first'] else 2
+    ]
+    
+    position_map = {"TOP": 1, "JUNGLE": 2, "MIDDLE": 3, "BOTTOM": 4, "UTILITY": 5}
+    
+    try:
+        champions = sorted(
+            [(p['championName'], position_map[p['individualPosition']]) 
+             for p in info['participants']],
+            key=lambda x: (x[1], x[0])
+        )
+    except KeyError as e:
+        logging.warning(f"Unexpected position in match {info['gameId']}: {e}")
+        return None
+
+    champion_ids = []
+    for champ, _ in champions:
+        if champ not in base['data']:
+            logging.warning(f"Unknown champion '{champ}' in match {info['gameId']}")
+            return None
+        champion_ids.append(base['data'][champ]['id'])
+
+    data.extend(champion_ids)
+    
+    return data
+
+
+def write_to_csv(filename, data):
+    print(data)
+    try:
+        with open(filename, "a") as file:
+            file.write(",".join(map(str, data)) + "\n")
+    except IOError as e:
+        logging.error(f"Error writing to CSV: {e}")
 
 
 def main():
-    global RIOT_KEY
-    args = args_parser()
-    RIOT_KEY = args.key
-    
-    username = args.username
-    tag = args.tag
-    region = args.region
-    server = args.server
-    num_matches = args.num_matches
-    tier = args.tier
-    page = args.page
-    
+    parser = argparse.ArgumentParser(description="RIOT API data manager")
+    parser.add_argument("-u", "--username", required=False, help="The username of the user")
+    parser.add_argument("-t", "--tag", required=False, help="The tag of the user")
+    parser.add_argument("-r", "--region", required=True, help="The region of the user")
+    parser.add_argument("-s", "--server", required=True, help="The server of the user")
+    parser.add_argument("-n", "--num_matches", type=int, default=20, help="The number of matches to get")
+    parser.add_argument("-ti", "--tier", required=True, help="The tier of the user")
+    parser.add_argument("-p", "--page", required=True, help="The page of the tier")
+    args = parser.parse_args()
+
     champions = get_champions()
     new_champions, base = clear_champions(champions)
-    
-    if not os.path.exists("../data/game.csv"):
-        with open("../data/game.csv", "a") as file:
-            file.write("gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald,t1_champ1id,t1_champ2id,t1_champ3id,t1_champ4id,t1_champ5id,t2_champ1id,t2_champ2id,t2_champ3id,t2_champ4id,t2_champ5id\n")
-    
-    riot_ids = get_riot_ids(server[:-1], tier, page)[0]
-    
-    puuid = get_puuid(region, riot_ids[0], riot_ids[1])
-    info_user = get_info_user(server, puuid)
-    user_matches = get_user_matches(region, puuid, num_matches)
-    match_info = get_match_info(region, user_matches)
-    for match in match_info:
-        data = extract_match_info(match, base)
-        with open("../data/game.csv", "a") as file:
-            for i in range(len(data)):
-                file.write(f"{data[i]},")
-            file.write("\n")
-        # get_other_players(match)
-    # print(user_matches[0])
+
+    csv_file = f"../data/game_{args.tier}.csv"
+    if not os.path.exists(csv_file):
+        headers = "gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald," + \
+                  ",".join([f"t{i}_champ{j}id" for i in range(1, 3) for j in range(1, 6)])
+        write_to_csv(csv_file, headers.split(','))
+
+    riot_ids = get_riot_ids(args.server[:-1], args.tier, args.page)
+    for riot_id in riot_ids:
+        puuid = get_puuid(args.region, riot_id[0], riot_id[1])
+        
+        if puuid:
+            user_matches = get_user_matches(args.region, puuid, args.num_matches)
+            for match_id in user_matches:
+                match_info = get_match_info(args.region, match_id)
+                if match_info:
+                    data = extract_match_info(match_info, base)
+                    if data:
+                        write_to_csv(csv_file, data)
+                    else:
+                        logging.info(f"Skipped match {match_id} due to invalid data")
 
     with open("../data/champion_info_3.json", "w") as file:
         json.dump(new_champions, file, indent=4)
