@@ -67,7 +67,8 @@ def get_match_info(region, user_matches):
                     continue
 
                 game_ids.append(match_info.json())
-                return game_ids
+                break
+        return game_ids
 
     else:
         match_info = requests.get(f"https://{region}.api.riotgames.com/lol/match/v5/matches/{user_matches[0]}?api_key={RIOT_KEY}")
@@ -81,6 +82,15 @@ def get_match_info(region, user_matches):
         game_ids.append(match_info.json())
 
         return game_ids
+
+
+position = {
+    "TOP" : 1,
+    "JUNGLE" : 2,
+    "MIDDLE" : 3,
+    "BOTTOM" : 4,
+    "UTILITY" : 5
+}
 
 
 def extract_match_info(match_info):
@@ -98,9 +108,18 @@ def extract_match_info(match_info):
     firstDragon = 1 if match_info['info']['teams'][0]['objectives']['dragon']['first'] is True else 2
     firstRiftHerald = 1 if match_info['info']['teams'][0]['objectives']['riftHerald']['first'] is True else 2
     
-    print(winner)
-    champions_used = [match_info['info']['participants'][i]['championName'] for i in range(len(match_info['info']['participants']))]
-    # print(champions_used)
+    # print(winner)
+    champions_used = [(match_info['info']['participants'][i]['championName'], position[match_info['info']['participants'][i]["individualPosition"]]) for i in range(len(match_info['info']['participants']))]
+    t1 = champions_used[:5]
+    t2 = champions_used[5:]
+
+    t1 = sorted(t1, key=lambda x: x[1])
+    t2 = sorted(t2, key=lambda x: x[1])
+    
+    t1 = [t1[i][0] for i in range(len(t1))]
+    t2 = [t2[i][0] for i in range(len(t2))]
+    
+    champions_used = t1 + t2
     
     data = [gameId, creationTime, gameDuration, seasonId, winner, firstBlood, firstTower, firstInihibitor, firstBaron, firstDragon, firstRiftHerald] + [champions_used[i] for i in range(len(champions_used))]
     return data
@@ -171,7 +190,9 @@ def main():
     puuid = get_puuid(region, riot_ids[0], riot_ids[1])
     info_user = get_info_user(server, puuid)
     user_matches = get_user_matches(region, puuid, num_matches)
+    print(len(user_matches))
     match_info = get_match_info(region, user_matches)
+    print(len(match_info))
     for match in match_info:
         data = extract_match_info(match)
         with open("../data/game.csv", "a") as file:
@@ -179,7 +200,6 @@ def main():
                 file.write(f"{data[i]},")
             file.write("\n")
         # get_other_players(match)
-        break
     # print(user_matches[0])
     champions = get_champions()
     clear_champions(champions)

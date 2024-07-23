@@ -1,2 +1,7 @@
 gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald,t1_champ1id,t1_champ2id,t1_champ3id,t1_champ4id,t1_champ5id,t2_champ1id,t2_champ2id,t2_champ3id,t2_champ4id,t2_champ5id
-5056537607,1721713419856,1963,14,2,2,1,2,2,2,1,Yorick,Yuumi,Lux,Naafiri,Sett,Zyra,Sivir,JarvanIV,Zed,Chogath,
+5056537607,1721713419856,1963,14,2,2,1,2,2,2,1,Sett,Yorick,Naafiri,Lux,Yuumi,Chogath,JarvanIV,Zed,Sivir,Zyra,
+5056410061,1721709877036,2041,14,2,1,1,2,2,2,2,Gangplank,JarvanIV,Katarina,Ezreal,Braum,Smolder,Vi,Cassiopeia,Jhin,Zoe,
+5056010032,1721701520378,3033,14,2,1,2,2,1,2,1,Cassiopeia,Graves,Annie,Ashe,Lulu,Teemo,JarvanIV,Zeri,Hwei,Seraphine,
+5055855211,1721698511637,1784,14,1,2,1,1,1,1,1,Trundle,JarvanIV,Ahri,Ezreal,Karma,Akali,Shaco,Hwei,Kaisa,Seraphine,
+5055546020,1721691843724,1480,14,1,2,1,1,1,2,2,Teemo,JarvanIV,Aurora,MissFortune,Morgana,Camille,Belveth,Kassadin,Jhin,Maokai,
+5055431439,1721689190187,2120,14,1,2,1,1,1,1,1,Mordekaiser,Briar,Hwei,Kaisa,Neeko,Kayn,JarvanIV,Aurora,Xayah,Pyke,

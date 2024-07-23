@@ -42,7 +42,7 @@ def clean_df(df, start=True, more=None):
     
     df =df.join(combined_df1).join(combined_df2)
     df = df.drop(t1 + t2, axis=1)
-    print(df)
+    # print(df)
     return df
 
 
@@ -55,7 +55,7 @@ def model(data):
     
     importances = dict(zip(clf.feature_names_in_, clf.feature_importances_))
     sorted_importances = sorted(importances.items(), key=lambda x: x[1], reverse=True)
-    print(sorted_importances)
+    # print(sorted_importances)
     return
 
 
@@ -77,9 +77,9 @@ def main():
     start = args.start
     more = args.more
     
-    df = pd.read_csv('../data/games.csv')
+    df = pd.read_csv('../data/game.csv')
 
-    print(df.columns)
+    # print(df.columns)
     # print(df.seasonId.value_counts())  # season 9???
 
     champ_data = json.load(open("../data/champion_info.json"))
@@ -97,7 +97,7 @@ def main():
     
     champ_name = "Volibear"
     winrate = champ_winrate(df, champ_name)
-    print(winrate)
+    print(f"Winrate of {champ_name}: {str(winrate)}")
 
 
 def args_parser():
@@ -106,7 +106,6 @@ def args_parser():
     parser.add_argument('-m', '--more', type=int, help='More arguments')
     return parser.parse_args()
 
-    
 
 if __name__ == "__main__":
     main()
