@@ -93,8 +93,7 @@ position = {
 }
 
 
-def extract_match_info(match_info):
-    data = {}
+def extract_match_info(match_info, base):
     # csv headers: gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald,t1_champ1id,t1_champ1_sum1,t1_champ1_sum2,t1_champ2id,t1_champ2_sum1,t1_champ2_sum2,t1_champ3id,t1_champ3_sum1,t1_champ3_sum2,t1_champ4id,t1_champ4_sum1,t1_champ4_sum2,t1_champ5id,t1_champ5_sum1,t1_champ5_sum2,t1_towerKills,t1_inhibitorKills,t1_baronKills,t1_dragonKills,t1_riftHeraldKills,t1_ban1,t1_ban2,t1_ban3,t1_ban4,t1_ban5,t2_champ1id,t2_champ1_sum1,t2_champ1_sum2,t2_champ2id,t2_champ2_sum1,t2_champ2_sum2,t2_champ3id,t2_champ3_sum1,t2_champ3_sum2,t2_champ4id,t2_champ4_sum1,t2_champ4_sum2,t2_champ5id,t2_champ5_sum1,t2_champ5_sum2,t2_towerKills,t2_inhibitorKills,t2_baronKills,t2_dragonKills,t2_riftHeraldKills,t2_ban1,t2_ban2,t2_ban3,t2_ban4,t2_ban5
     gameId = match_info['info']['gameId']
     creationTime = match_info['info']['gameCreation']
@@ -112,12 +111,13 @@ def extract_match_info(match_info):
     champions_used = [(match_info['info']['participants'][i]['championName'], position[match_info['info']['participants'][i]["individualPosition"]]) for i in range(len(match_info['info']['participants']))]
     t1 = champions_used[:5]
     t2 = champions_used[5:]
-
     t1 = sorted(t1, key=lambda x: x[1])
     t2 = sorted(t2, key=lambda x: x[1])
-    
     t1 = [t1[i][0] for i in range(len(t1))]
     t2 = [t2[i][0] for i in range(len(t2))]
+    
+    t1 = [base['data'][champ]['id'] for champ in t1]
+    t2 = [base['data'][champ]['id'] for champ in t2]
     
     champions_used = t1 + t2
     
@@ -145,15 +145,38 @@ def get_champions():
 
 
 def clear_champions(champions):
-    new_champions = {}
-    # print(champions['data']['Aatrox'])
-
+    new_champions = {
+        "type": "champion",
+        "version": champions['version'],
+        "data" : {}
+    }
+    base = new_champions
+    '''
+    "1": {
+        "title": "the Darkin Blade",
+        "id": 1,
+        "key": "Aatrox",
+        "name": "Aatrox",
+    },
+    '''
     i = 1
     for campion in champions['data']:
-        #print(champions['data'][campion])
-        break
+        new_champions['data'][str(i)] = {
+            "title": champions['data'][campion]['title'],
+            "id": i,
+            "key": champions['data'][campion]['id'],
+            "name": champions['data'][campion]['name']
+        }
+        base['data'][campion] = {
+            "title": champions['data'][campion]['title'],
+            "id": i,
+            "key": champions['data'][campion]['id'],
+            "name": champions['data'][campion]['name']
+        }
+        i += 1
+    
+    return new_champions, base
 
-    # print(new_champions)
 
 def args_parser():
     parser = argparse.ArgumentParser(description="RIOT API data manager")
@@ -181,6 +204,9 @@ def main():
     tier = args.tier
     page = args.page
     
+    champions = get_champions()
+    new_champions, base = clear_champions(champions)
+    
     if not os.path.exists("../data/game.csv"):
         with open("../data/game.csv", "a") as file:
             file.write("gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald,t1_champ1id,t1_champ2id,t1_champ3id,t1_champ4id,t1_champ5id,t2_champ1id,t2_champ2id,t2_champ3id,t2_champ4id,t2_champ5id\n")
@@ -190,19 +216,18 @@ def main():
     puuid = get_puuid(region, riot_ids[0], riot_ids[1])
     info_user = get_info_user(server, puuid)
     user_matches = get_user_matches(region, puuid, num_matches)
-    print(len(user_matches))
     match_info = get_match_info(region, user_matches)
-    print(len(match_info))
     for match in match_info:
-        data = extract_match_info(match)
+        data = extract_match_info(match, base)
         with open("../data/game.csv", "a") as file:
             for i in range(len(data)):
                 file.write(f"{data[i]},")
             file.write("\n")
         # get_other_players(match)
     # print(user_matches[0])
-    champions = get_champions()
-    clear_champions(champions)
+
+    with open("../data/champion_info_3.json", "w") as file:
+        json.dump(new_champions, file, indent=4)
 
 
 if __name__ == "__main__":
