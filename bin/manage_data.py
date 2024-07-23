@@ -3,6 +3,7 @@ import json
 import argparse
 from scrap import get_riot_ids
 import time
+import os
 
 # import os
 # import getpass
@@ -73,20 +74,41 @@ def get_match_info(region, user_matches):
         if match_info.status_code != 200:
             print("Error match info: ", match_info.json())
             return None
+        
+        with open("../data/match_info.json", "w") as file:
+            json.dump(match_info.json(), file, indent=4)
+
         game_ids.append(match_info.json())
 
         return game_ids
 
 
 def extract_match_info(match_info):
+    data = {}
     # csv headers: gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald,t1_champ1id,t1_champ1_sum1,t1_champ1_sum2,t1_champ2id,t1_champ2_sum1,t1_champ2_sum2,t1_champ3id,t1_champ3_sum1,t1_champ3_sum2,t1_champ4id,t1_champ4_sum1,t1_champ4_sum2,t1_champ5id,t1_champ5_sum1,t1_champ5_sum2,t1_towerKills,t1_inhibitorKills,t1_baronKills,t1_dragonKills,t1_riftHeraldKills,t1_ban1,t1_ban2,t1_ban3,t1_ban4,t1_ban5,t2_champ1id,t2_champ1_sum1,t2_champ1_sum2,t2_champ2id,t2_champ2_sum1,t2_champ2_sum2,t2_champ3id,t2_champ3_sum1,t2_champ3_sum2,t2_champ4id,t2_champ4_sum1,t2_champ4_sum2,t2_champ5id,t2_champ5_sum1,t2_champ5_sum2,t2_towerKills,t2_inhibitorKills,t2_baronKills,t2_dragonKills,t2_riftHeraldKills,t2_ban1,t2_ban2,t2_ban3,t2_ban4,t2_ban5
+    gameId = match_info['info']['gameId']
+    creationTime = match_info['info']['gameCreation']
+    gameDuration = match_info['info']['gameDuration']
+    seasonId = match_info['info']['gameVersion'].split('.')[0]
+    winner = 1 if match_info['info']['teams'][0]['win'] is True else 2
+    firstBlood = 1 if match_info['info']['teams'][0]['objectives']['champion']['first'] is True else 2
+    firstTower = 1 if match_info['info']['teams'][0]['objectives']['tower']['first'] is True else 2
+    firstInihibitor = 1 if match_info['info']['teams'][0]['objectives']['inhibitor']['first'] is True else 2
+    firstBaron = 1 if match_info['info']['teams'][0]['objectives']['baron']['first'] is True else 2
+    firstDragon = 1 if match_info['info']['teams'][0]['objectives']['dragon']['first'] is True else 2
+    firstRiftHerald = 1 if match_info['info']['teams'][0]['objectives']['riftHerald']['first'] is True else 2
+    
+    print(winner)
     champions_used = [match_info['info']['participants'][i]['championName'] for i in range(len(match_info['info']['participants']))]
-    print(champions_used)
+    # print(champions_used)
+    
+    data = [gameId, creationTime, gameDuration, seasonId, winner, firstBlood, firstTower, firstInihibitor, firstBaron, firstDragon, firstRiftHerald] + [champions_used[i] for i in range(len(champions_used))]
+    return data
 
 
 def get_other_players(match_info):
     players = match_info['metadata']['participants']
-    print(players)
+    # print(players)
 
 
 def get_champions():
@@ -140,6 +162,10 @@ def main():
     tier = args.tier
     page = args.page
     
+    if not os.path.exists("../data/game.csv"):
+        with open("../data/game.csv", "a") as file:
+            file.write("gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald,t1_champ1id,t1_champ2id,t1_champ3id,t1_champ4id,t1_champ5id,t2_champ1id,t2_champ2id,t2_champ3id,t2_champ4id,t2_champ5id\n")
+    
     riot_ids = get_riot_ids(server[:-1], tier, page)[0]
     
     puuid = get_puuid(region, riot_ids[0], riot_ids[1])
@@ -147,7 +173,11 @@ def main():
     user_matches = get_user_matches(region, puuid, num_matches)
     match_info = get_match_info(region, user_matches)
     for match in match_info:
-        extract_match_info(match)
+        data = extract_match_info(match)
+        with open("../data/game.csv", "a") as file:
+            for i in range(len(data)):
+                file.write(f"{data[i]},")
+            file.write("\n")
         # get_other_players(match)
         break
     # print(user_matches[0])
