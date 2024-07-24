@@ -107,7 +107,7 @@ def clear_champions(champions):
         champ_data = {
             "title": champ['title'],
             "id": i,
-            "key": champ_name,
+            "key": champ['key'],
             "name": champ_name
         }
         new_champions['data'][str(i)] = champ_data
