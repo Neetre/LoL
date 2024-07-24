@@ -37,6 +37,8 @@ def rate_limit(func):
             result = func(*args, **kwargs)
             if result is not None:
                 return result
+            if result.status_code == 404:
+                return None
             logging.info("Rate limit reached. Waiting 10 seconds...")
             time.sleep(10)
     return wrapper
@@ -81,11 +83,16 @@ def clear_champions(champions):
     base = new_champions.copy()
     
     for i, (key, champ) in enumerate(champions['data'].items(), start=1):
+        if champ['name'] == 'Fiddlesticks':
+            champ_name = 'FiddleSticks' # what the hell
+        else:
+            champ_name = champ['name']
+
         champ_data = {
             "title": champ['title'],
             "id": i,
-            "key": champ['id'],
-            "name": champ['name']
+            "key": champ_name,
+            "name": champ_name
         }
         new_champions['data'][str(i)] = champ_data
         base['data'][key] = champ_data
@@ -162,14 +169,16 @@ def main():
 
     champions = get_champions()
     new_champions, base = clear_champions(champions)
+    with open("../data/champion_info_3.json", "w") as file:
+        json.dump(new_champions, file, indent=4)
 
     csv_file = f"../data/game_{args.tier}.csv"
     if not os.path.exists(csv_file):
         headers = "gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald," + \
                   ",".join([f"t{i}_champ{j}id" for i in range(1, 3) for j in range(1, 6)])
         write_to_csv(csv_file, headers.split(','))
-
-    riot_ids = get_riot_ids(args.server[:-1], args.tier, args.page)
+    
+    riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1], args.tier, args.page)
     for riot_id in riot_ids:
         puuid = get_puuid(args.region, riot_id[0], riot_id[1])
         
@@ -183,9 +192,6 @@ def main():
                         write_to_csv(csv_file, data)
                     else:
                         logging.info(f"Skipped match {match_id} due to invalid data")
-
-    with open("../data/champion_info_3.json", "w") as file:
-        json.dump(new_champions, file, indent=4)
 
 
 if __name__ == "__main__":

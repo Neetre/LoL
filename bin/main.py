@@ -66,7 +66,7 @@ def champ_winrate(df, champ_name):
     losses1 = len(df[(df[f't1_{champ_name}'] == 1) & (df['winner'] == 2)])
     losses2 = len(df[(df[f't2_{champ_name}'] == 1) & (df['winner'] == 1)])
     
-    winrate = (wins1 + wins2) / (wins1 + wins2 + losses1 + losses2)
+    winrate = (wins1 + wins2) / (wins1 + wins2 + losses1 + losses2 + 1e08)
     
     return winrate
 
@@ -77,12 +77,12 @@ def main():
     start = args.start
     more = args.more
     
-    df = pd.read_csv('../data/game.csv')
+    df = pd.read_csv('../data/game_emerald.csv')
 
     # print(df.columns)
     # print(df.seasonId.value_counts())  # season 9???
 
-    champ_data = json.load(open("../data/champion_info.json"))
+    champ_data = json.load(open("../data/champion_info_3.json"))
     
     df = elab_champs(df, champ_data)
     # print(df)
