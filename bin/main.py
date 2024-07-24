@@ -66,7 +66,10 @@ def champ_winrate(df, champ_name):
     losses1 = len(df[(df[f't1_{champ_name}'] == 1) & (df['winner'] == 2)])
     losses2 = len(df[(df[f't2_{champ_name}'] == 1) & (df['winner'] == 1)])
     
-    winrate = (wins1 + wins2) / (wins1 + wins2 + losses1 + losses2 + 1e08)
+    try:
+        winrate = (wins1 + wins2) / (wins1 + wins2 + losses1 + losses2)
+    except ZeroDivisionError:
+        return None
     
     return winrate
 
@@ -95,15 +98,20 @@ def main():
     data = (X_train, X_test, y_train, y_test)
     model(data)
     
-    champ_name = "Volibear"
-    winrate = champ_winrate(df, champ_name)
-    print(f"Winrate of {champ_name}: {str(winrate)}")
+    if args.champion is not None:
+        champ_name = args.champion
+        winrate = champ_winrate(df, champ_name)
+        if winrate is not None:
+            print(f"Winrate of {champ_name}: {str(winrate)}")
+        else:
+            print("Error occurred")
 
 
 def args_parser():
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-s', '--start', action='store_true', help='Start of the game')
-    parser.add_argument('-m', '--more', type=int, help='More arguments')
+    parser = argparse.ArgumentParser(description='Predict the winner of a League of Legends game')
+    parser.add_argument('-s', '--start', action='store_true', help='Start of the game, only uses starting champions')
+    parser.add_argument('-m', '--more', type=int, help='More arguments, uses more data (1-5)')
+    parser.add_argument('-c', '--champion', type=str, help='Champion name to get winrate')
     return parser.parse_args()
 
 

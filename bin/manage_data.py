@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import HTTPError, Timeout, TooManyRedirects, RequestException
 import json
 import argparse
 from scrap import get_riot_ids
@@ -25,9 +26,26 @@ def make_request(url, params=None):
         response = requests.get(url, params=params)
         response.raise_for_status()
         return response.json()
-    except requests.RequestException as e:
-        logging.error(f"API request failed: {e}")
+    except HTTPError as e:
+        if 400 <= response.status_code < 500:
+            logging.error(f"Client error: {e}")
+            return None
+        elif 500 <= response.status_code < 600:
+            logging.error(f"Server error: {e}")
+            return None
+        else:
+            logging.error(f"HTTP error occurred: {e}")
+            return None
+    except Timeout:
+        logging.error("Request timed out")
         return None
+    except TooManyRedirects:
+        logging.error("Too many redirects")
+        return None
+    except RequestException as e:
+        logging.error(f"An error occurred while making the request: {e}")
+        return None
+    return None
 
 
 # Rate limiter decorator
@@ -37,8 +55,6 @@ def rate_limit(func):
             result = func(*args, **kwargs)
             if result is not None:
                 return result
-            if result.status_code == 404:
-                return None
             logging.info("Rate limit reached. Waiting 10 seconds...")
             time.sleep(10)
     return wrapper
@@ -164,7 +180,7 @@ def main():
     parser.add_argument("-s", "--server", required=True, help="The server of the user")
     parser.add_argument("-n", "--num_matches", type=int, default=20, help="The number of matches to get")
     parser.add_argument("-ti", "--tier", required=True, help="The tier of the user")
-    parser.add_argument("-p", "--page", required=True, help="The page of the tier")
+    parser.add_argument("-p", "--page", required=True, help="The page of the tier, can also be a list of pages (e.g. 1,2,3)")
     args = parser.parse_args()
 
     champions = get_champions()
@@ -178,20 +194,37 @@ def main():
                   ",".join([f"t{i}_champ{j}id" for i in range(1, 3) for j in range(1, 6)])
         write_to_csv(csv_file, headers.split(','))
     
-    riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1], args.tier, args.page)
-    for riot_id in riot_ids:
-        puuid = get_puuid(args.region, riot_id[0], riot_id[1])
-        
-        if puuid:
-            user_matches = get_user_matches(args.region, puuid, args.num_matches)
-            for match_id in user_matches:
-                match_info = get_match_info(args.region, match_id)
-                if match_info:
-                    data = extract_match_info(match_info, base)
-                    if data:
-                        write_to_csv(csv_file, data)
-                    else:
-                        logging.info(f"Skipped match {match_id} due to invalid data")
+    if len(args.page.split(',')) > 1 :
+        for page in args.page.split(','):
+            riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1], args.tier, page)
+            for riot_id in riot_ids:
+                puuid = get_puuid(args.region, riot_id[0], riot_id[1])
+                
+                if puuid:
+                    user_matches = get_user_matches(args.region, puuid, args.num_matches)
+                    for match_id in user_matches:
+                        match_info = get_match_info(args.region, match_id)
+                        if match_info:
+                            data = extract_match_info(match_info, base)
+                            if data:
+                                write_to_csv(csv_file, data)
+                            else:
+                                logging.info(f"Skipped match {match_id} due to invalid data")
+    else:
+        riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1], args.tier, args.page)
+        for riot_id in riot_ids:
+            puuid = get_puuid(args.region, riot_id[0], riot_id[1])
+            
+            if puuid:
+                user_matches = get_user_matches(args.region, puuid, args.num_matches)
+                for match_id in user_matches:
+                    match_info = get_match_info(args.region, match_id)
+                    if match_info:
+                        data = extract_match_info(match_info, base)
+                        if data:
+                            write_to_csv(csv_file, data)
+                        else:
+                            logging.info(f"Skipped match {match_id} due to invalid data")
 
 
 if __name__ == "__main__":
