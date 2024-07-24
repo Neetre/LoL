@@ -10,6 +10,7 @@
 This package is a tool for predicting the outcome of League of Legends matches. It uses data from the Riot API to train a machine learning model that predicts the outcome of matches based on various factors such as player performance, team composition, and game statistics.
 
 Project Structure:
+
 ```plaintext
 LOL/
 ├── bin/
@@ -28,6 +29,7 @@ LOL/
 ```
 
 Main Features:
+
 * Predict the outcome of a match, by using the main.py script.
 * Update the data from the Riot API, by using the manage_data.py script.
 
@@ -57,7 +59,7 @@ To predict the result of a match:
 Else, if you want to get the latest data from the Riot API:
 2. Execute `python manage_data.py --help` (use `python3` on Linux/macOS) in your terminal
 
-    This will update the data in the `data` directory.
+    The `--help` flag displays available command-line arguments.
 
 ## Author
 

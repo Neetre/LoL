@@ -7,6 +7,7 @@ import time
 import os
 import logging
 from dotenv import load_dotenv
+from log import Log
 
 # Load environment variables
 load_dotenv()
@@ -103,11 +104,14 @@ def clear_champions(champions):
             champ_name = 'FiddleSticks' # what the hell
         else:
             champ_name = champ['name']
+            
+        if key == "Fiddlesticks":
+            key = "FiddleSticks"
 
         champ_data = {
             "title": champ['title'],
             "id": i,
-            "key": champ['key'],
+            "key": key,
             "name": champ_name
         }
         new_champions['data'][str(i)] = champ_data

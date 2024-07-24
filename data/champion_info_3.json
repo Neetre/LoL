@@ -125,13 +125,13 @@
         "11": {
             "title": "The Star Forger",
             "id": 11,
-            "key": "Aurelion Sol",
+            "key": "AurelionSol",
             "name": "Aurelion Sol"
         },
         "AurelionSol": {
             "title": "The Star Forger",
             "id": 11,
-            "key": "Aurelion Sol",
+            "key": "AurelionSol",
             "name": "Aurelion Sol"
         },
         "12": {
@@ -173,13 +173,13 @@
         "15": {
             "title": "the Empress of the Void",
             "id": 15,
-            "key": "Bel'Veth",
+            "key": "Belveth",
             "name": "Bel'Veth"
         },
         "Belveth": {
             "title": "the Empress of the Void",
             "id": 15,
-            "key": "Bel'Veth",
+            "key": "Belveth",
             "name": "Bel'Veth"
         },
         "16": {
@@ -269,13 +269,13 @@
         "23": {
             "title": "the Terror of the Void",
             "id": 23,
-            "key": "Cho'Gath",
+            "key": "Chogath",
             "name": "Cho'Gath"
         },
         "Chogath": {
             "title": "the Terror of the Void",
             "id": 23,
-            "key": "Cho'Gath",
+            "key": "Chogath",
             "name": "Cho'Gath"
         },
         "24": {
@@ -329,13 +329,13 @@
         "28": {
             "title": "the Madman of Zaun",
             "id": 28,
-            "key": "Dr. Mundo",
+            "key": "DrMundo",
             "name": "Dr. Mundo"
         },
         "DrMundo": {
             "title": "the Madman of Zaun",
             "id": 28,
-            "key": "Dr. Mundo",
+            "key": "DrMundo",
             "name": "Dr. Mundo"
         },
         "29": {
@@ -392,7 +392,7 @@
             "key": "FiddleSticks",
             "name": "FiddleSticks"
         },
-        "Fiddlesticks": {
+        "FiddleSticks": {
             "title": "the Ancient Fear",
             "id": 33,
             "key": "FiddleSticks",
@@ -593,13 +593,13 @@
         "50": {
             "title": "the Exemplar of Demacia",
             "id": 50,
-            "key": "Jarvan IV",
+            "key": "JarvanIV",
             "name": "Jarvan IV"
         },
         "JarvanIV": {
             "title": "the Exemplar of Demacia",
             "id": 50,
-            "key": "Jarvan IV",
+            "key": "JarvanIV",
             "name": "Jarvan IV"
         },
         "51": {
@@ -653,13 +653,13 @@
         "55": {
             "title": "Daughter of the Void",
             "id": 55,
-            "key": "Kai'Sa",
+            "key": "Kaisa",
             "name": "Kai'Sa"
         },
         "Kaisa": {
             "title": "Daughter of the Void",
             "id": 55,
-            "key": "Kai'Sa",
+            "key": "Kaisa",
             "name": "Kai'Sa"
         },
         "56": {
@@ -761,13 +761,13 @@
         "64": {
             "title": "the Voidreaver",
             "id": 64,
-            "key": "Kha'Zix",
+            "key": "Khazix",
             "name": "Kha'Zix"
         },
         "Khazix": {
             "title": "the Voidreaver",
             "id": 64,
-            "key": "Kha'Zix",
+            "key": "Khazix",
             "name": "Kha'Zix"
         },
         "65": {
@@ -797,49 +797,49 @@
         "67": {
             "title": "the Mouth of the Abyss",
             "id": 67,
-            "key": "Kog'Maw",
+            "key": "KogMaw",
             "name": "Kog'Maw"
         },
         "KogMaw": {
             "title": "the Mouth of the Abyss",
             "id": 67,
-            "key": "Kog'Maw",
+            "key": "KogMaw",
             "name": "Kog'Maw"
         },
         "68": {
             "title": "the Pride of Nazumah",
             "id": 68,
-            "key": "K'Sante",
+            "key": "KSante",
             "name": "K'Sante"
         },
         "KSante": {
             "title": "the Pride of Nazumah",
             "id": 68,
-            "key": "K'Sante",
+            "key": "KSante",
             "name": "K'Sante"
         },
         "69": {
             "title": "the Deceiver",
             "id": 69,
-            "key": "LeBlanc",
+            "key": "Leblanc",
             "name": "LeBlanc"
         },
         "Leblanc": {
             "title": "the Deceiver",
             "id": 69,
-            "key": "LeBlanc",
+            "key": "Leblanc",
             "name": "LeBlanc"
         },
         "70": {
             "title": "the Blind Monk",
             "id": 70,
-            "key": "Lee Sin",
+            "key": "LeeSin",
             "name": "Lee Sin"
         },
         "LeeSin": {
             "title": "the Blind Monk",
             "id": 70,
-            "key": "Lee Sin",
+            "key": "LeeSin",
             "name": "Lee Sin"
         },
         "71": {
@@ -953,13 +953,13 @@
         "80": {
             "title": "the Wuju Bladesman",
             "id": 80,
-            "key": "Master Yi",
+            "key": "MasterYi",
             "name": "Master Yi"
         },
         "MasterYi": {
             "title": "the Wuju Bladesman",
             "id": 80,
-            "key": "Master Yi",
+            "key": "MasterYi",
             "name": "Master Yi"
         },
         "81": {
@@ -977,25 +977,25 @@
         "82": {
             "title": "the Bounty Hunter",
             "id": 82,
-            "key": "Miss Fortune",
+            "key": "MissFortune",
             "name": "Miss Fortune"
         },
         "MissFortune": {
             "title": "the Bounty Hunter",
             "id": 82,
-            "key": "Miss Fortune",
+            "key": "MissFortune",
             "name": "Miss Fortune"
         },
         "83": {
             "title": "the Monkey King",
             "id": 83,
-            "key": "Wukong",
+            "key": "MonkeyKing",
             "name": "Wukong"
         },
         "MonkeyKing": {
             "title": "the Monkey King",
             "id": 83,
-            "key": "Wukong",
+            "key": "MonkeyKing",
             "name": "Wukong"
         },
         "84": {
@@ -1121,13 +1121,13 @@
         "94": {
             "title": "the Boy and His Yeti",
             "id": 94,
-            "key": "Nunu & Willump",
+            "key": "Nunu",
             "name": "Nunu & Willump"
         },
         "Nunu": {
             "title": "the Boy and His Yeti",
             "id": 94,
-            "key": "Nunu & Willump",
+            "key": "Nunu",
             "name": "Nunu & Willump"
         },
         "95": {
@@ -1253,13 +1253,13 @@
         "105": {
             "title": "the Void Burrower",
             "id": 105,
-            "key": "Rek'Sai",
+            "key": "RekSai",
             "name": "Rek'Sai"
         },
         "RekSai": {
             "title": "the Void Burrower",
             "id": 105,
-            "key": "Rek'Sai",
+            "key": "RekSai",
             "name": "Rek'Sai"
         },
         "106": {
@@ -1277,13 +1277,13 @@
         "107": {
             "title": "the Chem-Baroness",
             "id": 107,
-            "key": "Renata Glasc",
+            "key": "Renata",
             "name": "Renata Glasc"
         },
         "Renata": {
             "title": "the Chem-Baroness",
             "id": 107,
-            "key": "Renata Glasc",
+            "key": "Renata",
             "name": "Renata Glasc"
         },
         "108": {
@@ -1565,13 +1565,13 @@
         "131": {
             "title": "The River King",
             "id": 131,
-            "key": "Tahm Kench",
+            "key": "TahmKench",
             "name": "Tahm Kench"
         },
         "TahmKench": {
             "title": "The River King",
             "id": 131,
-            "key": "Tahm Kench",
+            "key": "TahmKench",
             "name": "Tahm Kench"
         },
         "132": {
@@ -1673,13 +1673,13 @@
         "140": {
             "title": "the Card Master",
             "id": 140,
-            "key": "Twisted Fate",
+            "key": "TwistedFate",
             "name": "Twisted Fate"
         },
         "TwistedFate": {
             "title": "the Card Master",
             "id": 140,
-            "key": "Twisted Fate",
+            "key": "TwistedFate",
             "name": "Twisted Fate"
         },
         "141": {
@@ -1757,13 +1757,13 @@
         "147": {
             "title": "the Eye of the Void",
             "id": 147,
-            "key": "Vel'Koz",
+            "key": "Velkoz",
             "name": "Vel'Koz"
         },
         "Velkoz": {
             "title": "the Eye of the Void",
             "id": 147,
-            "key": "Vel'Koz",
+            "key": "Velkoz",
             "name": "Vel'Koz"
         },
         "148": {
@@ -1877,13 +1877,13 @@
         "157": {
             "title": "the Seneschal of Demacia",
             "id": 157,
-            "key": "Xin Zhao",
+            "key": "XinZhao",
             "name": "Xin Zhao"
         },
         "XinZhao": {
             "title": "the Seneschal of Demacia",
             "id": 157,
-            "key": "Xin Zhao",
+            "key": "XinZhao",
             "name": "Xin Zhao"
         },
         "158": {
