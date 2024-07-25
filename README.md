@@ -33,6 +33,12 @@ Main Features:
 * Predict the outcome of a match, by using the main.py script.
 * Update the data from the Riot API, by using the manage_data.py script.
 
+To make the program work, you need to have a Riot API key. You can get one by following the instructions on the [Riot Developer Portal](https://developer.riotgames.com/).
+When you have your API key, you need to create a file called `.env` in the root directory of the project, and add the following line to it:
+
+```plaintext
+RIOT_API_KEY="YOUR_API_KEY"
+```
 
 ## Requirements
 

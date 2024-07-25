@@ -25,24 +25,25 @@ def elab_champs(df, champ_data):
     
     return df
 
-def clean_df(df, start=True, more=None, is_prediction=False):
+def clean_df(df, start=False, more=None, is_prediction=False):
     t1 = ["t1_champ1", "t1_champ2", "t1_champ3", "t1_champ4", "t1_champ5"]
     t2 = ["t2_champ1", "t2_champ2", "t2_champ3", "t2_champ4", "t2_champ5"]
     
-    if not is_prediction:
-        additional = ["firstBlood", "winner"] if start is not True else ["winner"]
-        if more is not None:
-            additional.extend([
-                'firstDragon' if more >= 1 else None,
-                'firstTower' if more >= 2 else None,
-                'firstInhibitor' if more >= 3 else None,
-                'firstBaron' if more >= 4 else None,
-                'firstRiftHerald' if more >= 5 else None
-            ])
-        additional = [col for col in additional if col is not None]
-        df = df[t1 + t2 + additional]
-    else:
-        df = df[t1 + t2]
+    additional = ["winner"] if not is_prediction else []
+    if not start:
+        additional.append("firstBlood")
+    if more is not None:
+        additional.extend([
+            'firstDragon' if more >= 1 else None,
+            'firstTower' if more >= 2 else None,
+            'firstInhibitor' if more >= 3 else None,
+            'firstBaron' if more >= 4 else None,
+            'firstRiftHerald' if more >= 5 else None
+        ])
+    additional = [col for col in additional if col is not None]
+    
+    columns_to_keep = t1 + t2 + additional
+    df = df[columns_to_keep]
 
     dummies = [pd.get_dummies(df[col], prefix=f"t{i//5+1}") for i, col in enumerate(t1 + t2)]
     df = pd.concat([df] + dummies, axis=1)
@@ -62,12 +63,16 @@ def extract_data(file, champ_data):
     t1_champions = [champ_data['data'][champ]['id'] for champ in t1_champions]
     t2_champions = [champ_data['data'][champ]['id'] for champ in t2_champions]
     
-    columns = [f't1_champ{i+1}id' for i in range(5)] + [f't2_champ{i+1}id' for i in range(5)]
-    df = pd.DataFrame([t1_champions + t2_champions], columns=columns)
+    additional_columns = data['game_stats'].keys()
+    additional_data = [data['game_stats'][key] for key in additional_columns]
+    
+    columns = [f't1_champ{i+1}id' for i in range(5)] + [f't2_champ{i+1}id' for i in range(5)] + list(additional_columns)
+    df = pd.DataFrame([t1_champions + t2_champions + additional_data], columns=columns)
+    print(df)
     return df
 
 
-def model(data, predict_data=None):
+def model(data, predict_data=None, start=False, more=None):
     X_train, X_test, y_train, y_test = data
 
     clf = RandomForestClassifier(n_jobs=-1)
@@ -76,10 +81,13 @@ def model(data, predict_data=None):
     
     try:
         if predict_data is not None:
-            predict_data = clean_df(predict_data, start=True, is_prediction=True)
-            missing_cols = set(X_train.columns) - set(predict_data.columns)
-            missing_df = pd.DataFrame(0, index=predict_data.index, columns=list(missing_cols))
-            predict_data = pd.concat([predict_data, missing_df], axis=1)
+            predict_data = clean_df(predict_data, start=start, more=more, is_prediction=True)
+
+            missing_cols = list(set(X_train.columns) - set(predict_data.columns))
+            missing_data = pd.DataFrame(0, index=predict_data.index, columns=missing_cols)
+            predict_data = pd.concat([predict_data, missing_data], axis=1)
+            
+            # Ensure the order of columns matches X_train
             predict_data = predict_data[X_train.columns]
 
             prediction = clf.predict(predict_data)
@@ -109,7 +117,6 @@ def champ_winrate(df, champ_name):
 
 
 def main():
-    
     args = args_parser()
     start = args.start
     more = args.more
@@ -130,7 +137,7 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     
     data = (X_train, X_test, y_train, y_test)
-    model(data, predict_data if args.file else None)
+    model(data, predict_data, start, more)
     
     if args.champion is not None:
         champ_name = args.champion
@@ -144,7 +151,7 @@ def main():
 
 def args_parser():
     parser = argparse.ArgumentParser(description='Predict the winner of a League of Legends game')
-    parser.add_argument('-s', '--start', action='store_true', help='Start of the game, only uses starting champions')
+    parser.add_argument('-s', '--start', default=False, action='store_true', help='Start of the game, only uses starting champions')
     parser.add_argument('-m', '--more', type=int, help='More arguments, uses more data (1-5)')
     parser.add_argument('-f', '--file', type=str, default="../data/predict.yaml", help='File to use for prediction')
     parser.add_argument('-c', '--champion', type=str, help='Champion name to get winrate')
@@ -157,4 +164,4 @@ if __name__ == "__main__":
     logger.log(False)
     main()
     logger.log(True)
-    #print(extract_data("../data/predict.yaml", json.load(open("../data/champion_info_3.json"))))
+    # print(extract_data("../data/predict.yaml", json.load(open("../data/champion_info_3.json"))))

@@ -1,21 +1,22 @@
 t1_team:
-  t1_champ1: "Garen"
-  t1_champ2: "Viego"
-  t1_champ3: "Yone"
-  t1_champ4: "Twitch"
-  t1_champ5: "Yuumi"
+  t1_champ1: "Renekton"
+  t1_champ2: "Sejuani"
+  t1_champ3: "Ahri"
+  t1_champ4: "Lucian"
+  t1_champ5: "Nami"
 
 t2_team:
-  t2_champ1: "Yorick"
-  t2_champ2: "Vi"
-  t2_champ3: "Zed"
-  t2_champ4: "Jhin"
-  t2_champ5: "Morgana"
+  t2_champ1: "Camille"
+  t2_champ2: "LeeSin"
+  t2_champ3: "Syndra"
+  t2_champ4: "Ashe"
+  t2_champ5: "Blitzcrank"
 
 game_stats:
+# 1 if t1 got the first, 2 otherwise
   firstBlood: 0
-  firstTower: 0
   firstDragon: 0
-  firstBaron: 0
+  firstTower: 0
   firstInhibitor: 0
+  firstBaron: 0
   firstRiftHerald: 0

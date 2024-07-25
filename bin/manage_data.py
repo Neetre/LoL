@@ -30,23 +30,28 @@ def make_request(url, params=None):
     except HTTPError as e:
         if 400 <= response.status_code < 500:
             logging.error(f"Client error: {e}")
+            logger.write_error(f"Client error: {e}")
             return None
         elif 500 <= response.status_code < 600:
             logging.error(f"Server error: {e}")
+            logger.write_error(f"Server error: {e}")
             return None
         else:
             logging.error(f"HTTP error occurred: {e}")
+            logger.write_error(f"HTTP error occurred: {e}")
             return None
     except Timeout:
         logging.error("Request timed out")
+        logger.write_error("Request timed out")
         return None
     except TooManyRedirects:
         logging.error("Too many redirects")
+        logger.write_error("Too many redirects")
         return None
     except RequestException as e:
         logging.error(f"An error occurred while making the request: {e}")
+        logger.write_error(f"An error occurred while making the request: {e}")
         return None
-    return None
 
 
 # Rate limiter decorator
@@ -57,6 +62,7 @@ def rate_limit(func):
             if result is not None:
                 return result
             logging.info("Rate limit reached. Waiting 10 seconds...")
+            logger.write_msg("Rate limit reached. Waiting 10 seconds...")
             time.sleep(10)
     return wrapper
 
@@ -98,13 +104,13 @@ def clear_champions(champions):
         "data": {}
     }
     base = new_champions.copy()
-    
+
     for i, (key, champ) in enumerate(champions['data'].items(), start=1):
         if champ['name'] == 'Fiddlesticks':
             champ_name = 'FiddleSticks' # what the hell
         else:
             champ_name = champ['name']
-            
+
         if key == "Fiddlesticks":
             key = "FiddleSticks"
 
@@ -116,17 +122,17 @@ def clear_champions(champions):
         }
         new_champions['data'][str(i)] = champ_data
         base['data'][key] = champ_data
-    
     return new_champions, base
 
 
 def extract_match_info(match_info, base):
     info = match_info['info']
     teams = info['teams']
-    
+
     # Check for invalid positions
     if any(p['individualPosition'] == 'INVALID' for p in info['participants']):
         logging.info(f"Skipping match {info['gameId']} due to invalid position")
+        logger.write_msg(f"Skipping match {info['gameId']} due to invalid position")
         return None
 
     data = [
@@ -142,9 +148,9 @@ def extract_match_info(match_info, base):
         1 if teams[0]['objectives']['dragon']['first'] else 2,
         1 if teams[0]['objectives']['riftHerald']['first'] else 2
     ]
-    
+
     position_map = {"TOP": 1, "JUNGLE": 2, "MIDDLE": 3, "BOTTOM": 4, "UTILITY": 5}
-    
+
     try:
         champions = sorted(
             [(p['championName'], position_map[p['individualPosition']]) 
@@ -153,6 +159,7 @@ def extract_match_info(match_info, base):
         )
     except KeyError as e:
         logging.warning(f"Unexpected position in match {info['gameId']}: {e}")
+        logger.write_error(f"Unexpected position in match {info['gameId']}: {e}")
         return None
 
     champion_ids = []
@@ -163,7 +170,6 @@ def extract_match_info(match_info, base):
         champion_ids.append(base['data'][champ]['id'])
 
     data.extend(champion_ids)
-    
     return data
 
 
@@ -174,6 +180,7 @@ def write_to_csv(filename, data):
             file.write(",".join(map(str, data)) + "\n")
     except IOError as e:
         logging.error(f"Error writing to CSV: {e}")
+        logger.write_error(f"Error writing to CSV: {e}")
 
 
 def main():
@@ -197,13 +204,13 @@ def main():
         headers = "gameId,creationTime,gameDuration,seasonId,winner,firstBlood,firstTower,firstInhibitor,firstBaron,firstDragon,firstRiftHerald," + \
                   ",".join([f"t{i}_champ{j}id" for i in range(1, 3) for j in range(1, 6)])
         write_to_csv(csv_file, headers.split(','))
-    
+
     if len(args.page.split(',')) > 1 :
         for page in args.page.split(','):
             riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1], args.tier, page)
             for riot_id in riot_ids:
                 puuid = get_puuid(args.region, riot_id[0], riot_id[1])
-                
+
                 if puuid:
                     user_matches = get_user_matches(args.region, puuid, args.num_matches)
                     for match_id in user_matches:
@@ -214,11 +221,12 @@ def main():
                                 write_to_csv(csv_file, data)
                             else:
                                 logging.info(f"Skipped match {match_id} due to invalid data")
+                                logger.write_msg(f"Skipped match {match_id} due to invalid data")
     else:
         riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1], args.tier, args.page)
         for riot_id in riot_ids:
             puuid = get_puuid(args.region, riot_id[0], riot_id[1])
-            
+
             if puuid:
                 user_matches = get_user_matches(args.region, puuid, args.num_matches)
                 for match_id in user_matches:
@@ -229,7 +237,12 @@ def main():
                             write_to_csv(csv_file, data)
                         else:
                             logging.info(f"Skipped match {match_id} due to invalid data")
+                            logger.write_msg(f"Skipped match {match_id} due to invalid data")
 
 
 if __name__ == "__main__":
+    name_f = os.path.basename(__file__)
+    logger = Log(name_f)
+    logger.log(False)
     main()
+    logger.log(True)
