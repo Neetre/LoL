@@ -40,6 +40,10 @@ When you have your API key, you need to create a file called `.env` in the root 
 RIOT_API_KEY="YOUR_API_KEY"
 ```
 
+### Improvements
+
+- [ ] Add real-time data fetching from the Riot API.
+
 ## Requirements
 
 python >= 3.8
@@ -63,9 +67,19 @@ To predict the result of a match:
     The `--help` flag displays available command-line arguments.
 
 Else, if you want to get the latest data from the Riot API:
-2. Execute `python manage_data.py --help` (use `python3` on Linux/macOS) in your terminal
+2. Execute `python manage_data.py [--help]` (use `python3` on Linux/macOS) in your terminal
 
     The `--help` flag displays available command-line arguments.
+
+Result for the prediction will be displayed in the terminal.
+![Prediction](/data/readme/test.png)
+
+This is how the download of the data from op.gg looks like:
+![Data](/data/readme/data.png)
+
+### Note
+
+Before running the program, make sure you have inserted your game data in the predict.yaml file, else the prediction program will not work.
 
 ## Author
 

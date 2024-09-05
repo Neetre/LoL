@@ -1,0 +1,40 @@
+----------------------------------------------
+13:01:54 del giorno 09/05/2024, Ishtar, Windows, manage_data.py, Programma iniziato alle ore 13:01:54 del giorno 09/05/2024
+----------------------------------------------
+13:03:12 del giorno 09/05/2024, Ishtar, Windows, manage_data.py, Programma iniziato alle ore 13:03:12 del giorno 09/05/2024
+----------------------------------------------
+13:04:28 del giorno 09/05/2024, Ishtar, Windows, manage_data.py, Programma iniziato alle ore 13:04:28 del giorno 09/05/2024
+----------------------------------------------
+13:06:59 del giorno 09/05/2024, Ishtar, Windows, manage_data.py, Programma iniziato alle ore 13:06:59 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7067773506: 'Invalid', Time: 13:07:00 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7067773506 due to invalid data, Time: 13:07:00 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064652382: 'Invalid', Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064652382 due to invalid data, Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064618109: 'Invalid', Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064618109 due to invalid data, Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064578670: 'Invalid', Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064578670 due to invalid data, Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064532961: 'Invalid', Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064532961 due to invalid data, Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064484825: 'Invalid', Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064484825 due to invalid data, Time: 13:07:01 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064423362: 'Invalid', Time: 13:07:02 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064423362 due to invalid data, Time: 13:07:02 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064371072: 'Invalid', Time: 13:07:02 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064371072 due to invalid data, Time: 13:07:02 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7064312111: 'Invalid', Time: 13:07:02 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7064312111 due to invalid data, Time: 13:07:02 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7103119416: 'Invalid', Time: 13:07:07 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7103119416 due to invalid data, Time: 13:07:07 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7101507516: 'Invalid', Time: 13:07:08 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7101507516 due to invalid data, Time: 13:07:08 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7101463461: 'Invalid', Time: 13:07:08 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7101463461 due to invalid data, Time: 13:07:08 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7101404142: 'Invalid', Time: 13:07:08 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7101404142 due to invalid data, Time: 13:07:08 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7101800274: 'Invalid', Time: 13:07:18 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7101800274 due to invalid data, Time: 13:07:18 del giorno 09/05/2024
+File: manage_data.py, Error: Unexpected position in match 7095347311: 'Invalid', Time: 13:07:18 del giorno 09/05/2024
+File: manage_data.py, Message: Skipped match EUW1_7095347311 due to invalid data, Time: 13:07:18 del giorno 09/05/2024
+File: manage_data.py, Error: Client error: 429 Client Error: Too Many Requests for url: https://europe.api.riotgames.com/lol/match/v5/matches/EUW1_7095334761?api_key=RGAPI-5874b118-214e-4e74-8460-13a4e03446a4, Time: 13:07:18 del giorno 09/05/2024
+File: manage_data.py, Message: Rate limit reached. Waiting 10 seconds..., Time: 13:07:18 del giorno 09/05/2024

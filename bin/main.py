@@ -68,7 +68,6 @@ def extract_data(file, champ_data):
     
     columns = [f't1_champ{i+1}id' for i in range(5)] + [f't2_champ{i+1}id' for i in range(5)] + list(additional_columns)
     df = pd.DataFrame([t1_champions + t2_champions + additional_data], columns=columns)
-    print(df)
     return df
 
 
@@ -152,7 +151,7 @@ def main():
 def args_parser():
     parser = argparse.ArgumentParser(description='Predict the winner of a League of Legends game')
     parser.add_argument('-s', '--start', default=False, action='store_true', help='Start of the game, only uses starting champions')
-    parser.add_argument('-m', '--more', type=int, help='More arguments, uses more data (1-5)')
+    parser.add_argument('-m', '--more', type=int, help='More arguments, uses more data (1-5), insert number of arguments')
     parser.add_argument('-f', '--file', type=str, default="../data/predict.yaml", help='File to use for prediction')
     parser.add_argument('-c', '--champion', type=str, help='Champion name to get winrate')
     return parser.parse_args()

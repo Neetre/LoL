@@ -1,16 +1,16 @@
 t1_team:
-  t1_champ1: "Renekton"
-  t1_champ2: "Sejuani"
-  t1_champ3: "Ahri"
-  t1_champ4: "Lucian"
-  t1_champ5: "Nami"
+  t1_champ1: ""
+  t1_champ2: ""
+  t1_champ3: ""
+  t1_champ4: ""
+  t1_champ5: ""
 
 t2_team:
-  t2_champ1: "Camille"
-  t2_champ2: "LeeSin"
-  t2_champ3: "Syndra"
-  t2_champ4: "Ashe"
-  t2_champ5: "Blitzcrank"
+  t2_champ1: ""
+  t2_champ2: ""
+  t2_champ3: ""
+  t2_champ4: ""
+  t2_champ5: ""
 
 game_stats:
 # 1 if t1 got the first, 2 otherwise

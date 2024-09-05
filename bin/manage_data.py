@@ -185,10 +185,10 @@ def write_to_csv(filename, data):
 
 def main():
     parser = argparse.ArgumentParser(description="RIOT API data manager")
-    parser.add_argument("-u", "--username", required=False, help="The username of the user")
-    parser.add_argument("-t", "--tag", required=False, help="The tag of the user")
-    parser.add_argument("-r", "--region", required=True, help="The region of the user")
-    parser.add_argument("-s", "--server", required=True, help="The server of the user")
+    parser.add_argument("-u", "--username", required=False, help="The username of the user (not required)")
+    parser.add_argument("-t", "--tag", required=False, help="The tag of the user (not required)")
+    parser.add_argument("-r", "--region", required=True, help="The region of the user  (americas, asia, europe)")
+    parser.add_argument("-s", "--server", required=True, help="The server of the user (e.g. EUW1)")
     parser.add_argument("-n", "--num_matches", type=int, default=20, help="The number of matches to get")
     parser.add_argument("-ti", "--tier", required=True, help="The tier of the user")
     parser.add_argument("-p", "--page", required=True, help="The page of the tier, can also be a list of pages (e.g. 1,2,3)")
@@ -207,7 +207,7 @@ def main():
 
     if len(args.page.split(',')) > 1 :
         for page in args.page.split(','):
-            riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1], args.tier, page)
+            riot_ids = get_riot_ids("kr" if args.server == "kr" else args.server[:-1].lower(), args.tier, page)
             for riot_id in riot_ids:
                 puuid = get_puuid(args.region, riot_id[0], riot_id[1])
 
